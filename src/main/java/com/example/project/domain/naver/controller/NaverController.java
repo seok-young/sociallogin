@@ -89,8 +89,12 @@ public class NaverController {
 
         if (exists) {
             System.out.println("회원 존재");
+            // jwt 토큰 생성하고 DB저장 및 메인화면으로 리다이렉트
+
         } else {
             System.out.println("회원 비존재");
+            // 회원가입화면으로 리다이렉트
+            response.sendRedirect("/joinMember.html");
         }
 
 
