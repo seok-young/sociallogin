@@ -76,8 +76,15 @@ public class ApiV1MemberController {
             }
         }
         Map<String, Object> claims = jwtProvider.getClaims(accessToken);
-        String username = (String) claims.get("username");
-        Member member = this.memberService.getMember(username);
-        return new RsData("200", "회원정보 조회 성공", new MemberDto(member));
+        System.out.println(claims);
+        String email = (String) claims.get("email");
+        System.out.println(email);
+
+
+
+        Member member = this.memberService.getMember(email);
+
+        return new RsData("200", "회원정보 조회 성공",
+                new MemberDto(member));
     }
 }

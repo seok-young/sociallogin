@@ -50,6 +50,7 @@ public class JwtProvider {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", member.getId());
         claims.put("name", member.getName());
+        claims.put("email", member.getEmail());
         long now = new Date().getTime();
         Date accessTokenExpiresIn = new Date(now + 1000L * seconds);
         return Jwts.builder()
