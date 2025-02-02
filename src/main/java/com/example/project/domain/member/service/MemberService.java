@@ -38,7 +38,11 @@ public class MemberService {
                 .providerId(providerId)
                 .build();
 
+        String refreshToken = jwtProvider.genRefreshToken(member);
+        member.setRefreshToken(refreshToken);
+
         return memberRepository.save(member);
+
     }
 
     public Member getMember(String email) {
