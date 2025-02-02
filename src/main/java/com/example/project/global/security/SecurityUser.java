@@ -23,4 +23,4 @@ public class SecurityUser extends User {
         );
         return auth;
     }
-}}
+}
