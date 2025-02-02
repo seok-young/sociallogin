@@ -3,13 +3,14 @@ package com.example.project.domain.member.service;
 import com.example.project.domain.member.entity.Member;
 import com.example.project.domain.member.repository.MemberRepository;
 import com.example.project.global.jwt.JwtProvider;
+import com.example.project.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -47,5 +48,23 @@ public class MemberService {
         return member.orElse(null);
     }
 
+    // 토큰 유효성 검증
+    public boolean validateToken(String token) {
+        return jwtProvider.verify(token);
+    }
+    // 토큰갱신
+    public RsData<String> refreshAccessToken(String refreshToken) {
+        Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다."));
+        String accessToken = jwtProvider.genAccessToken(member);
+        return new RsData<>("200", "토큰 갱신에 성공하였습니다.", accessToken);
+    }
+    // 토큰으로 User 정보 가져오기
+    public SecurityUser getUserFromAccessToken(String accessToken) {
+        Map<String, Object> payloadBody = jwtProvider.getClaims(accessToken);
+        long id = (int) payloadBody.get("id");
+        String username = (String) payloadBody.get("username");
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        return new SecurityUser(id, username, "", authorities);
+    }
 
 }
