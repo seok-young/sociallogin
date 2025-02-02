@@ -69,18 +69,5 @@ public class JwtProvider {
                 .get("body", String.class);
         return Ut.toMap(body);
         }
-
-    public boolean verify(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSecretKey())
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
-    }
-
 
