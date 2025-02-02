@@ -1,11 +1,21 @@
 package com.example.project.domain.member.controller;
 
+import com.example.project.domain.member.dto.MemberDto;
+import com.example.project.domain.member.dto.MemberLogin;
 import com.example.project.domain.member.dto.MemberRequest;
 import com.example.project.domain.member.entity.Member;
+import com.example.project.domain.member.repository.MemberRepository;
 import com.example.project.domain.member.service.MemberService;
+import com.example.project.global.jwt.JwtProvider;
+import com.example.project.global.rsData.RsData;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -13,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 public class ApiV1MemberController {
 
     private final MemberService memberService;
+    private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/signup")
     public String join(@Valid @ModelAttribute MemberRequest memberRequest) {
@@ -27,9 +39,27 @@ public class ApiV1MemberController {
     }
 
     @PostMapping("/login")
-    public void login() {
-        System.out.println("login");
+    public RsData<Void> login(@Valid @RequestBody MemberLogin memberLogin, HttpServletResponse response) {
+        Member member = memberService.getMember(memberLogin.getEmail());
+        String token = jwtProvider.genAccessToken(member);
+        String refreshToken = jwtProvider.genRefreshToken(member);
+
+        // 토큰 DB에 저장
+        member.setAccessToken(token);
+        member.setRefreshToken(refreshToken);
+        memberRepository.save(member);
+
+        // 응답 데이터에 accessToken 이름으로 토큰 발급
+        Cookie cookie = new Cookie("accessToken", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60);
+        response.addCookie(cookie);
+
+        return new RsData<>("200", "Login Success");
     }
+
 
     @GetMapping("/logout")
     public void logout() {
@@ -37,7 +67,17 @@ public class ApiV1MemberController {
     }
 
     @GetMapping("/me")
-    public void me() {
-        System.out.println("me");
+    public RsData<MemberDto> me(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String accessToken = "";
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("accessToken")) {
+                accessToken = cookie.getValue();
+            }
+        }
+        Map<String, Object> claims = jwtProvider.getClaims(accessToken);
+        String username = (String) claims.get("username");
+        Member member = this.memberService.getMember(username);
+        return new RsData("200", "회원정보 조회 성공", new MemberDto(member));
     }
 }

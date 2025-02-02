@@ -2,10 +2,14 @@ package com.example.project.domain.member.service;
 
 import com.example.project.domain.member.entity.Member;
 import com.example.project.domain.member.repository.MemberRepository;
+import com.example.project.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public Member join(String email, String password, String name, String nickname, String providerId) {
 
@@ -31,9 +36,16 @@ public class MemberService {
                 .providerId(providerId)
                 .build();
 
-
-
         return memberRepository.save(member);
     }
+
+    public Member getMember(String email) {
+        Optional<Member> member = memberRepository.findByEmail(email);
+        if (member.isEmpty()) {
+            throw new NoSuchElementException("No member found with email: " + email);
+        }
+        return member.orElse(null);
+    }
+
 
 }

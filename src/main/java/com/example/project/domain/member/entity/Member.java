@@ -25,6 +25,9 @@ public class Member extends BaseEntity {
     String role;
     String provider;
     String providerId;
+
+    // jwt 토큰
+    String accessToken;
     String refreshToken;
 
     }
