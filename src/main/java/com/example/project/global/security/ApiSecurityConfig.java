@@ -23,8 +23,8 @@ public class ApiSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/*/articles").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/*/articles/*").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/*/members/login").permitAll() // 로그인은 누구나 가능, post 요청만 허용
-                        .requestMatchers(HttpMethod.GET, "/api/*/members/*").permitAll() //이후에 수정필요
-                        .requestMatchers(HttpMethod.POST, "/api/*/members/*").permitAll() //이후에 수정필요
+                        .requestMatchers(HttpMethod.POST, "/api/*/members/signup").permitAll() // 회원가입은 누구나 가능
+                        .requestMatchers(HttpMethod.GET, "/api/*/members/logout").permitAll() // 로그아웃
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable()) // csrf 토큰 끄기
