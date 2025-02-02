@@ -15,6 +15,7 @@ spring:
   h2:
     console:
       enabled: true
+      path: /h2-console
   jpa:
     open-in-view: false
     hibernate:
@@ -43,12 +44,17 @@ spring:
       client-id: "${application.spring.security.naver.client-id}"
       client-secret: "${application.spring.security.naver.client-secret}"
 
-
-
   jwt:
     secret-key: "${application.spring.security.jwt.secret-key}"
 
+  accessToken:
+    expirationSeconds: "${application.spring.security.accssToken.expirationSeconds}"
+
+
+
 logging:
+  file:
+    name: logs/applicaion.log
   level:
     '[com.example.server]': DEBUG
     '[org.hibernate.type]': TRACE

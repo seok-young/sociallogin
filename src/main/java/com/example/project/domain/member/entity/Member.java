@@ -1,23 +1,30 @@
 package com.example.project.domain.member.entity;
 
+import com.example.project.global.jpa.BaseEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
+@Getter
+@Setter
 @Entity
-public class Member {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    Long member_id;
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+public class Member extends BaseEntity {
+
 
     String email;
     String password;
+    String name;
     String nickname;
     String profile_url;
     String role;
     String provider;
-    String provider_id;
+    String providerId;
     String refreshToken;
 
     }

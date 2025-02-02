@@ -1,22 +1,29 @@
 package com.example.project.domain.naver.controller;
 
+import com.example.project.domain.member.dto.MemberRequest;
+import com.example.project.domain.member.entity.Member;
+import com.example.project.domain.member.service.MemberService;
 import com.example.project.domain.naver.service.NaverService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
 @Controller
-public class NaverController {
+public class ApiV1NaverController {
 
     private final NaverService naverService;
+    private final MemberService memberService;
 
     @Value("${spring.oauth2.naver.client-id}")
     private String clientId;
@@ -24,22 +31,9 @@ public class NaverController {
     @Value("${spring.oauth2.naver.url.redirect-uri}")
     private String redirectURI;
 
-//    @GetMapping("/api/auth/naver")
-//    public void loginPage(HttpServletResponse response) throws IOException {
-//        // redirect_uri 인코딩
-//        String encodedRedirectUri = URLEncoder.encode(redirectURI, "UTF-8");
-//
-//        // 최종 URL 생성
-//        String url = String.format("https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=%s&state=123456&redirect_uri=%s",
-//                clientId, encodedRedirectUri);
-//
-//        // URL로 리디렉션
-//        response.sendRedirect(url);
-//    }
-
     // 네이버 사용자 인증 후
     @GetMapping("/api/auth/naver")
-    public void loginCallback(@RequestParam("code") String code, @RequestParam("state") String state, HttpServletResponse response) throws IOException, InterruptedException {
+    public String loginCallback(@RequestParam("code") String code, @RequestParam("state") String state, HttpServletResponse response) throws IOException, InterruptedException {
         // code와 state 값 확인
         System.out.println("Code: " + code);
         System.out.println("State: " + state);
@@ -90,13 +84,17 @@ public class NaverController {
         if (exists) {
             System.out.println("회원 존재");
             // jwt 토큰 생성하고 DB저장 및 메인화면으로 리다이렉트
+            naverService.tokenGengerate(userInfo);
+            return "redirect:/home";
 
         } else {
             System.out.println("회원 비존재");
             // 회원가입화면으로 리다이렉트
-            response.sendRedirect("/joinMember.html");
+            return "redirect:/home";
         }
-
-
     }
+
+
+    // 회원가입
+
 }
